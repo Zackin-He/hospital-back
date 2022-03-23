@@ -2,7 +2,7 @@ export const menuList = [
     {
       key: '1',
       title: '首页',
-      url:'/home'
+      url:'/homePage'
     },
     {
       key: '2-1',

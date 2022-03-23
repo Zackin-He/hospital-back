@@ -1,5 +1,20 @@
 import axios from "axios";
-// axios.defaults.withCredentials = true
+import router from '@/router/index'
+import {Message} from 'element-ui'
+axios.defaults.withCredentials = true;
+axios.interceptors.response.use((res)=>{
+    if (res.data.status === 401) {
+        Message({
+            showClose: true,
+            message: '登录失效，请重新登录!',
+            type: 'error'
+          });
+        localStorage.setItem('token','');
+        router.push('/login');
+        console.log('请先登录');
+    }
+    return res
+})
 export default function ajax(url='',params={},type='GET') {
     // 1.变量
     let promise;

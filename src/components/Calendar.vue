@@ -14,6 +14,7 @@
     getDocById,scheduling
   } from '@/service/api/index'
   export default {
+    props:{'dID':Number,'schedule1':Array},
     data() {
       return {
         days: [],
@@ -78,8 +79,8 @@
         }, 0);
       },
       async find() {
-        let res = await getDocById(100003);
-        this.schedule = res.doc[0].dScheduling;
+        // let res = await getDocById(this.dID);
+        this.schedule = this.schedule1;
         for (let i = 0; i < this.schedule.length; i++) {
           if (this.schedule[i].date < new Date(new Date().setHours(0, 0, 0, 0)).getTime()) {
             this.schedule.splice(i, 1);
@@ -101,7 +102,7 @@
       },
       async submit(){
         console.log(this.schedule);
-        let res = await scheduling(100003,this.schedule);
+        let res = await scheduling(this.dID,this.schedule);
         this.schedule.forEach((item,index) => {
             this.$set(this.disableArray, index, new Date(item.date))
         });

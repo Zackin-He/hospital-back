@@ -2,11 +2,24 @@
   <div class="home">
     <el-container>
       <el-header>
-        <div class="nav_left">左边</div>
+        <div class="nav_left">
+          <div class="logo"><img src="@/img/logo.png" alt=""></div>
+        </div>
         <div class="nav_right">医院预约挂号管理系统</div>
         <div class="nav_info">
-          <span>头像</span>
-          <span>你好，管理员</span>
+          <el-dropdown @command="handleCommand">
+            <div class="nav_info_icon">
+              <el-avatar icon="el-icon-user-solid"></el-avatar>
+            </div>
+            <div class="nav_info_name"><span>{{userInfo.username}}</span></div>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item icon="el-icon-edit">修改信息</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-switch-button" command="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+
+          <!-- <button @click="login_out">退出登录</button> -->
+
         </div>
       </el-header>
       <el-container>
@@ -52,23 +65,80 @@
 </template>
 
 <script>
-import {menuList} from '@/dictionary/menu'
+  import {
+    Message,
+    MessageBox
+  } from 'element-ui'
+  import {
+    menuList
+  } from '@/dictionary/menu'
+  import {
+    mapState,
+    mapMutations
+  } from 'vuex'
+  import {
+    getUserInfo,
+    logout
+  } from '@/service/api/index'
   export default {
     components: {},
+    computed: {
+      ...mapState(['userInfo']),
+    },
+    mounted() {
+      this.get_user_info()
+    },
     methods: {
+      ...mapMutations(['user_info']),
       handleOpen(key, keyPath) {
         console.log(key, keyPath);
       },
       handleClose(key, keyPath) {
         console.log(key, keyPath);
       },
+      handleCommand(command){
+        if (command == 'logout') {
+          this.login_out()
+        }else{
+          alert('修改信息')
+        }
+      },
       selectMenu(index, indexPath) {
         menuList.forEach(item => {
-          if (item.key===index&&this.$route.path!==item.url) {
+          if (item.key === index && this.$route.path !== item.url) {
             console.log(item);
             this.$router.push(item.url)
           }
         });
+      },
+      async get_user_info() {
+        let res = await getUserInfo();
+        if (res.status === 200) {
+          this.user_info(res.data)
+          console.log(res.data);
+        }
+      },
+      login_out() {
+        MessageBox.confirm('是否确认退出登录', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          let res = await logout();
+          localStorage.setItem('token', '');
+          this.$router.push('/login')
+          console.log(res);
+          Message({
+            type: 'success',
+            message: '退出登录成功!'
+          });
+        }).catch(() => {
+          Message({
+            type: 'info',
+            message: '已取消操作'
+          });
+        });
+
       }
     }
   }
@@ -78,6 +148,16 @@ import {menuList} from '@/dictionary/menu'
   * {
     margin: 0;
     padding: 0;
+  }
+
+  .logo {
+    margin: 0 auto;
+    width: 60px;
+    height: 60px;
+  }
+
+  .logo img {
+    width: 100%;
   }
 
   .home {
@@ -101,6 +181,23 @@ import {menuList} from '@/dictionary/menu'
     height: 100%;
     line-height: 60px;
   }
+  .el-dropdown{
+    height: 60px;
+  }
+  .nav_info_icon {
+    float: left;
+    width: 60px;
+    height: 50px;
+    padding-top: 10px;
+    text-align: center;
+  }
+
+  .nav_info_name {
+    float: left;
+    /* width: 60px; */
+    height: 100%;
+    line-height: 60px;
+  }
 
   .nav_left {
     width: 200px;
@@ -120,7 +217,7 @@ import {menuList} from '@/dictionary/menu'
     padding: 0 !important;
     background-color: #4AB7BD;
     color: #333;
-    text-align: center;
+    /* text-align: center; */
     height: 60px;
   }
 
@@ -154,4 +251,8 @@ import {menuList} from '@/dictionary/menu'
     text-align: center;
     height: 100%
   }
+
+  /* .el-avatar{
+    margin-top: 10px;
+  } */
 </style>
