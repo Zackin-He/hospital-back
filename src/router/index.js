@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import G2 from '../views/G2.vue'
-import Canvas from '../views/Canvas.vue'
 
 Vue.use(VueRouter)
 
@@ -29,7 +27,7 @@ const routes = [
         return import(/* webpackChunkName: "addDoctor" */ '../views/department/Departments.vue')
       }},
       {path:'/addDepartments',name:'AddDepartments',component: function () {
-        return import(/* webpackChunkName: "addDoctor" */ '@/components/Calendar.vue')
+        return import(/* webpackChunkName: "addDoctor" */ '../views/department/AddDepartment.vue')
       }}
     ]
   },
@@ -40,11 +38,6 @@ const routes = [
       return import(/* webpackChunkName: "login" */ '../views/Login.vue')
     }
   },
-  {
-    path:'/canvas',
-    name:'Canvas',
-    component:Canvas
-  }
   // {
   //   path: '/about',
   //   name: 'about',

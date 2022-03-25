@@ -33,3 +33,7 @@ export const getDepartments = ()=>ajax(BASE_URL+'/web/api/departmentList');
 export const changeSpecailty = (s_id,oldDepartment,newDepartment,s_name,introduction)=>ajax(BASE_URL+'/web/api/changeSpecailty',{s_id,oldDepartment,newDepartment,s_name,introduction},'post');
 //修改医生信息
 export const changeDoctor = (dID,dName,dGender,s_id,s_name,introduction,docTitle)=>ajax(BASE_URL+'/web/api/changeDoctor',{dID,dName,dGender,s_id,s_name,introduction,docTitle},'post');
+//添加门诊部门
+export const addDepartment = (departmentName)=>ajax(BASE_URL+'/web/api/addDepartment',{departmentName},'post');
+//添加科室
+export const addSpecialty = (departmentName,specialtyName,specialtyID,introduction)=>ajax(BASE_URL+'/web/api/addSpecialty',{departmentName,specialtyName,specialtyID,introduction},'post');
