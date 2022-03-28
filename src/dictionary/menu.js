@@ -15,6 +15,11 @@ export const menuList = [
       url:'/addDoctor'
     },
     {
+      key:'2-3',
+      title:'个人排班',
+      url:'/personSchedule'
+    },
+    {
         key: '3-1',
         title: '科室管理',
         url:'/departments'

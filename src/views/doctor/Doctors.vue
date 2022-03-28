@@ -185,7 +185,7 @@
                 console.log(res);
                 if (res.status == 200) {
                     this.tableData = [];
-                    this.get_doctors();
+                    this.find_doc();
                     Message({
                         message: '修改医生信息成功!',
                         type: 'success'
@@ -200,6 +200,9 @@
                     res = await findDoc(this.findForm.name,this.findValue[1],this.findForm.docTitle);
                 }else{
                     res = await findDoc(this.findForm.name,'',this.findForm.docTitle);
+                }
+                if (res.status===200) {
+                    this.tableData = res.data
                 }
                 console.log(res);
             },

@@ -22,7 +22,7 @@ export const getDoctors = ()=>ajax(BASE_URL+'/web/api/getDoctors');
 
 // export const getData = ()=>ajax('https://zackin.usemock.com/getData');
 //登录
-export const loginTest = (username,password)=>ajax(BASE_URL+'/web/api/test',{username,password},'post');
+export const loginTest = (username,password,user_type)=>ajax(BASE_URL+'/web/api/test',{username,password,user_type},'post');
 //退出登录
 export const logout = ()=>ajax(BASE_URL+'/web/api/logout');
 //自动登录

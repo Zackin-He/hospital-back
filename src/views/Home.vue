@@ -30,30 +30,42 @@
               <i class="el-icon-s-home"></i>
               <span slot="title">首页</span>
             </el-menu-item>
-            <el-submenu index="2">
-              <template slot="title">
-                <i class="el-icon-user-solid"></i>
-                <span>医生管理</span>
-              </template>
-              <el-menu-item index="2-1">医生管理</el-menu-item>
-              <el-menu-item index="2-2">医生添加</el-menu-item>
-            </el-submenu>
-            <el-submenu index="3">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>科室管理</span>
-              </template>
-              <el-menu-item index="3-1">科室管理</el-menu-item>
-              <el-menu-item index="3-2">科室添加</el-menu-item>
-            </el-submenu>
-            <el-submenu index="4">
-              <template slot="title">
-                <i class="el-icon-s-promotion"></i>
-                <span>预约挂号管理</span>
-              </template>
-              <el-menu-item index="4-1">查询挂号单</el-menu-item>
-              <el-menu-item index="4-2">添加挂号单</el-menu-item>
-            </el-submenu>
+            <div class="admin" v-if="user_type=='admin'">
+              <el-submenu index="2">
+                <template slot="title">
+                  <i class="el-icon-user-solid"></i>
+                  <span>医生管理</span>
+                </template>
+                <el-menu-item index="2-1">医生管理</el-menu-item>
+                <el-menu-item index="2-2">医生添加</el-menu-item>
+              </el-submenu>
+              <el-submenu index="3">
+                <template slot="title">
+                  <i class="el-icon-menu"></i>
+                  <span>科室管理</span>
+                </template>
+                <el-menu-item index="3-1">科室管理</el-menu-item>
+                <el-menu-item index="3-2">科室添加</el-menu-item>
+              </el-submenu>
+              <el-submenu index="4">
+                <template slot="title">
+                  <i class="el-icon-s-promotion"></i>
+                  <span>预约挂号管理</span>
+                </template>
+                <el-menu-item index="4-1">查询挂号单</el-menu-item>
+                <el-menu-item index="4-2">添加挂号单</el-menu-item>
+              </el-submenu>
+            </div>
+            <div v-else-if="user_type=='doctor'">
+              <el-submenu index="2">
+                <template slot="title">
+                  <i class="el-icon-user-solid"></i>
+                  <span>医生管理</span>
+                </template>
+                <el-menu-item index="2-1">医生管理</el-menu-item>
+                <el-menu-item index="2-2">医生添加</el-menu-item>
+              </el-submenu>
+            </div>
           </el-menu>
         </el-aside>
         <el-main>
@@ -81,6 +93,11 @@
     logout
   } from '@/service/api/index'
   export default {
+    data() {
+      return {
+        user_type: ''
+      }
+    },
     components: {},
     computed: {
       ...mapState(['userInfo']),
@@ -96,10 +113,10 @@
       handleClose(key, keyPath) {
         console.log(key, keyPath);
       },
-      handleCommand(command){
+      handleCommand(command) {
         if (command == 'logout') {
           this.login_out()
-        }else{
+        } else {
           alert('修改信息')
         }
       },
@@ -107,14 +124,16 @@
         menuList.forEach(item => {
           if (item.key === index && this.$route.path !== item.url) {
             console.log(item);
-            this.$router.push(item.url)
+            this.$router.push(item.url);
           }
         });
       },
       async get_user_info() {
         let res = await getUserInfo();
         if (res.status === 200) {
-          this.user_info(res.data)
+          console.log(res);
+          this.user_type = res.data.type;
+          this.user_info(res.data);
           console.log(res.data);
         }
       },
@@ -181,9 +200,11 @@
     height: 100%;
     line-height: 60px;
   }
-  .el-dropdown{
+
+  .el-dropdown {
     height: 60px;
   }
+
   .nav_info_icon {
     float: left;
     width: 60px;
