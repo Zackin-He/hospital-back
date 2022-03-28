@@ -1,5 +1,21 @@
 <template>
     <div class="doctors">
+        <el-form style="margin-bottom:25px" :model="findForm" label-width="80px">
+            <span>医生姓名</span>
+            <el-input v-model="findForm.name" placeholder="请输入医生姓名" class="findDoc"></el-input>
+            <span>医生职称</span>
+            <el-select v-model="findForm.docTitle" clearable  class="findDoc" placeholder="请选择医生职称">
+                <el-option label="主任医师" value="主任医师"></el-option>
+                <el-option label="副主任医师" value="副主任医师"></el-option>
+                 <el-option label="主治医师" value="主治医师"></el-option>
+                <el-option label="副主治医师" value="副主治医师"></el-option>
+            </el-select>
+            <span>所属科室</span>
+            <el-cascader v-model="findValue" clearable placeholder="请选择科室" :options="options"
+                :props="{ expandTrigger: 'hover' }" @change="handleChange">
+            </el-cascader>
+              <el-button style="margin-left:30px" @click="find_doc" type="primary">查询医师</el-button>
+        </el-form>
         <el-table :data="tableData" height="500px" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
@@ -78,9 +94,12 @@
 </template>
 
 <script>
-    import {Message} from 'element-ui'
+    import {
+        Message
+    } from 'element-ui'
     import Calendar from '@/components/Calendar.vue'
     import {
+        findDoc,
         getDoctors,
         getDepartments,
         changeDoctor
@@ -102,15 +121,21 @@
                     docTitle: ''
                 },
                 value: [],
+                findValue:[],
                 formLabelWidth: '120px',
                 docID: null,
                 schedule: null,
-                options:[],
-                dID:null,
-                dDepartmentList:[]
+                options: [],
+                findOptions:[],
+                dID: null,
+                dDepartmentList: [],
+                findForm: {
+                    name: '',
+                    docTitle:''
+                }
             }
         },
-        created(){
+        created() {
             this.get_departments()
         },
         mounted() {
@@ -145,8 +170,8 @@
             },
             async change_doctor() {
                 let s_name;
-                this.dDepartmentList.forEach((item)=>{
-                    item.specialty.forEach((item2)=>{
+                this.dDepartmentList.forEach((item) => {
+                    item.specialty.forEach((item2) => {
                         if (item2.specialty_id === this.value[1]) {
                             s_name = item2.specialty_name;
                             return
@@ -155,7 +180,8 @@
                 })
                 console.log(222);
                 // dID,dName,dGender,s_id,s_name,introduction,docTitle
-                let res = await changeDoctor(this.doctor.dID,this.form.name,this.form.gender,this.value[1], s_name,this.form.introduction,this.form.docTitle);
+                let res = await changeDoctor(this.doctor.dID, this.form.name, this.form.gender, this.value[1],
+                    s_name, this.form.introduction, this.form.docTitle);
                 console.log(res);
                 if (res.status == 200) {
                     this.tableData = [];
@@ -167,6 +193,16 @@
                 }
                 this.dialogFormVisible = false
             },
+            async find_doc(){
+                //dName,dSpecialty,dTitle
+                let res
+                if (this.findValue.length>0) {
+                    res = await findDoc(this.findForm.name,this.findValue[1],this.findForm.docTitle);
+                }else{
+                    res = await findDoc(this.findForm.name,'',this.findForm.docTitle);
+                }
+                console.log(res);
+            },
             handleEdit(index, row) {
                 this.form.name = row.dName;
                 this.form.gender = row.dGender;
@@ -174,9 +210,9 @@
                 this.form.docTitle = row.docTitle;
                 this.doctor = row;
                 this.dDepartmentList.forEach(item => {
-                    item.specialty.forEach(item2 =>{
-                        if (item2.specialty_id==this.doctor.dPmtid) {
-                            this.value = [item.department,item2.specialty_id];       
+                    item.specialty.forEach(item2 => {
+                        if (item2.specialty_id == this.doctor.dPmtid) {
+                            this.value = [item.department, item2.specialty_id];
                         }
                     })
                 });
@@ -219,6 +255,10 @@
 
     .el-textarea {
         width: 230px;
+    }
+    .findDoc{
+        width: 160px;
+        margin-right: 30px;
     }
 
     .el-form-item__label {

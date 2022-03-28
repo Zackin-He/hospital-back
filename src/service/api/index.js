@@ -37,3 +37,4 @@ export const changeDoctor = (dID,dName,dGender,s_id,s_name,introduction,docTitle
 export const addDepartment = (departmentName)=>ajax(BASE_URL+'/web/api/addDepartment',{departmentName},'post');
 //添加科室
 export const addSpecialty = (departmentName,specialtyName,specialtyID,introduction)=>ajax(BASE_URL+'/web/api/addSpecialty',{departmentName,specialtyName,specialtyID,introduction},'post');
+export const findDoc = (dName,dSpecialty,dTitle)=>ajax(BASE_URL+'/web/api/getDoctorsByCondition',{dName,dSpecialty,dTitle},'post');
