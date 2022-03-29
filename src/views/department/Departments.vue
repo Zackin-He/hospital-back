@@ -11,7 +11,7 @@
             </el-select>
             <el-button style="margin-left:30px;float:right" @click="find_specialty" type="primary">查询科室</el-button>
         </el-form>
-        <el-table :data="tableData" height="440px" border style="width: 100%">
+        <el-table :data="tableData" height="75vh" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
             <el-table-column prop="s_name" label="科室名" width="160">

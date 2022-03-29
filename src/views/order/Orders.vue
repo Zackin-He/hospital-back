@@ -15,20 +15,20 @@
       </span>
       <el-button style="margin-left:15px;float:right" @click="find_orders" type="primary">查询</el-button>
     </el-form>
-    <el-table :data="tableData" style="width: 100%" height="440">
-      <el-table-column prop="regNumber" label="预约单号" width="130">
+    <el-table :data="tableData" style="width: 100%" height="75vh">
+      <el-table-column prop="regNumber" label="预约单号" width="150">
       </el-table-column>
-      <el-table-column prop="pName" label="患者姓名" width="100">
+      <el-table-column prop="pName" label="患者姓名" width="140">
       </el-table-column>
-      <el-table-column prop="pID" label="身份证号" width="200">
+      <el-table-column prop="pID" label="身份证号">
       </el-table-column>
       <el-table-column prop="pTel" label="手机号" width="140">
       </el-table-column>
-      <el-table-column prop="pDocName" label="医生姓名" width="100">
+      <el-table-column prop="pDocName" label="医生姓名" width="140">
       </el-table-column>
-      <el-table-column prop="dpmt" label="科室" width="120">
+      <el-table-column prop="dpmt" label="科室" width="140">
       </el-table-column>
-      <el-table-column prop="treatTime" label="就诊时间" width="200">
+      <el-table-column prop="treatTime" label="就诊时间">
       </el-table-column>
     </el-table>
   </div>

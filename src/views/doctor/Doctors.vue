@@ -16,7 +16,7 @@
             </el-cascader>
             <el-button style="margin-left:30px;float:right" @click="find_doc" type="primary">查询医师</el-button>
         </el-form>
-        <el-table :data="tableData" height="440px" border style="width: 100%">
+        <el-table :data="tableData" height="75vh" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
             <el-table-column prop="dName" label="姓名" width="120">

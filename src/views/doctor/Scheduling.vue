@@ -1,6 +1,6 @@
 <template>
   <div>
-      <Calendar :dID="docID" :schedule1="schedule" :key="docID" />
+      <Calendar id="calendar" :dID="docID" :schedule1="schedule" :key="docID" />
   </div>
 </template>
 
@@ -33,5 +33,8 @@ export default {
 </script>
 
 <style>
-
+#calendar{
+   margin: 0 auto;
+   height: 50vh;
+}
 </style>

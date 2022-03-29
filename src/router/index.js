@@ -84,9 +84,10 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   let token = localStorage.getItem("token");
   let type = localStorage.getItem("user_type");
+  console.log(token,type);
   if(to.path == "/login"){
     if(token){
-      next("/home");
+      next("/homePage");
     }else{
       next();
     }
