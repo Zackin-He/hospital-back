@@ -80,7 +80,14 @@
       },
       async find() {
         // let res = await getDocById(this.dID);
-        this.schedule = this.schedule1;
+        let res;
+        if (!this.schedule1) {
+          res = await getDocById(this.dID);
+          this.schedule = res.doc[0].dScheduling;
+        }else{
+          this.schedule = this.schedule1;
+        }
+        console.log(this.schedule);
         for (let i = 0; i < this.schedule.length; i++) {
           if (this.schedule[i].date < new Date(new Date().setHours(0, 0, 0, 0)).getTime()) {
             this.schedule.splice(i, 1);

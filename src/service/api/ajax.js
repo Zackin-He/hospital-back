@@ -10,8 +10,15 @@ axios.interceptors.response.use((res)=>{
             type: 'error'
           });
         localStorage.setItem('token','');
+        localStorage.setItem('user_type','')
         router.push('/login');
         console.log('请先登录');
+    }else if (res.data.status === 402) {
+        Message({
+            showClose: true,
+            message: '你无权限进行此操作!',
+            type: 'error'
+          });
     }
     return res
 })

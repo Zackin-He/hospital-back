@@ -28,6 +28,9 @@
         <el-button type="primary" @click="addSpecialty">立即添加</el-button>
       </el-form-item>
     </el-form>
+    <div class="img">
+      <img src="@/img/doctor1.png" alt="">
+    </div>
   </div>
 </template>
 
@@ -125,6 +128,7 @@
 
 <style scoped>
   .addDepartment {
+    position: relative;
     text-align: start;
   }
 
@@ -137,5 +141,14 @@
   }
   .el-textarea{
     width: 350px;
+  }
+  .img{
+    position: absolute;
+    width: 450px;
+    top: 0;
+    left: 500px;
+  }
+  .img img{
+    width: 100%;
   }
 </style>

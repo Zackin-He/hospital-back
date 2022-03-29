@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 import VCalendar from 'v-calendar'
 import { Button,Container,Header,Main,Aside,Menu,MenuItem,Submenu,MenuItemGroup,Table,TableColumn,
-  Dialog,Form,FormItem,Input,Select,Option,Col,Cascader,Avatar,Dropdown,DropdownItem,DropdownMenu,Row
+  Dialog,Form,FormItem,Input,Select,Option,Col,Cascader,Avatar,Dropdown,DropdownItem,DropdownMenu,Row,Card, Radio
   } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
@@ -37,6 +37,8 @@ Vue.use(Dropdown);
 Vue.use(DropdownItem)
 Vue.use(DropdownMenu)
 Vue.use(Row)
+Vue.use(Card)
+Vue.use(Radio)
 new Vue({
   router,
   store,

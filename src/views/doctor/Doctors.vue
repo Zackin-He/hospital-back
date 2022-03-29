@@ -1,22 +1,22 @@
 <template>
     <div class="doctors">
         <el-form style="margin-bottom:25px" :model="findForm" label-width="80px">
-            <span>医生姓名</span>
+            <span>医生姓名：</span>
             <el-input v-model="findForm.name" placeholder="请输入医生姓名" class="findDoc"></el-input>
-            <span>医生职称</span>
-            <el-select v-model="findForm.docTitle" clearable  class="findDoc" placeholder="请选择医生职称">
+            <span>医生职称：</span>
+            <el-select v-model="findForm.docTitle" clearable class="findDoc" placeholder="请选择医生职称">
                 <el-option label="主任医师" value="主任医师"></el-option>
                 <el-option label="副主任医师" value="副主任医师"></el-option>
-                 <el-option label="主治医师" value="主治医师"></el-option>
+                <el-option label="主治医师" value="主治医师"></el-option>
                 <el-option label="副主治医师" value="副主治医师"></el-option>
             </el-select>
-            <span>所属科室</span>
+            <span>所属科室：</span>
             <el-cascader v-model="findValue" clearable placeholder="请选择科室" :options="options"
                 :props="{ expandTrigger: 'hover' }" @change="handleChange">
             </el-cascader>
-              <el-button style="margin-left:30px" @click="find_doc" type="primary">查询医师</el-button>
+            <el-button style="margin-left:30px;float:right" @click="find_doc" type="primary">查询医师</el-button>
         </el-form>
-        <el-table :data="tableData" height="500px" border style="width: 100%">
+        <el-table :data="tableData" height="440px" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
             <el-table-column prop="dName" label="姓名" width="120">
@@ -33,9 +33,12 @@
             </el-table-column>
             <el-table-column label="操作" width="220">
                 <template slot-scope="scope">
-                    <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                    <el-button size="mini" type="primary" @click="handleSchedule(scope.$index, scope.row)">排班
+                    <el-button size="mini" :disabled="isdoctor" @click="handleEdit(scope.$index, scope.row)">编辑
+                    </el-button>
+                    <el-button size="mini" :disabled="isdoctor" type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="mini" :disabled="isdoctor" type="primary"
+                        @click="handleSchedule(scope.$index, scope.row)">排班
                     </el-button>
                 </template>
             </el-table-column>
@@ -95,10 +98,16 @@
 
 <script>
     import {
-        Message
+        mapState,
+        mapMutations
+    } from 'vuex'
+    import {
+        Message,
+        MessageBox
     } from 'element-ui'
     import Calendar from '@/components/Calendar.vue'
     import {
+        deleteDoctor,
         findDoc,
         getDoctors,
         getDepartments,
@@ -121,22 +130,30 @@
                     docTitle: ''
                 },
                 value: [],
-                findValue:[],
+                findValue: [],
                 formLabelWidth: '120px',
                 docID: null,
                 schedule: null,
                 options: [],
-                findOptions:[],
+                findOptions: [],
                 dID: null,
                 dDepartmentList: [],
                 findForm: {
                     name: '',
-                    docTitle:''
-                }
+                    docTitle: ''
+                },
+                isdoctor: false
             }
         },
+        computed: {
+            ...mapState(['userInfo']),
+        },
         created() {
-            this.get_departments()
+            this.get_departments();
+            console.log(this.userInfo.type);
+            if (this.userInfo.type === 'doctor') {
+                this.isdoctor = true
+            }
         },
         mounted() {
             this.get_doctors();
@@ -193,15 +210,15 @@
                 }
                 this.dialogFormVisible = false
             },
-            async find_doc(){
+            async find_doc() {
                 //dName,dSpecialty,dTitle
                 let res
-                if (this.findValue.length>0) {
-                    res = await findDoc(this.findForm.name,this.findValue[1],this.findForm.docTitle);
-                }else{
-                    res = await findDoc(this.findForm.name,'',this.findForm.docTitle);
+                if (this.findValue.length > 0) {
+                    res = await findDoc(this.findForm.name, this.findValue[1], this.findForm.docTitle);
+                } else {
+                    res = await findDoc(this.findForm.name, '', this.findForm.docTitle);
                 }
-                if (res.status===200) {
+                if (res.status === 200) {
                     this.tableData = res.data
                 }
                 console.log(res);
@@ -224,8 +241,29 @@
                 console.log(this.doctor);
                 console.log(index, row.dID);
             },
-            handleDelete(index, row) {
-                console.log(index, row.dID);
+            async handleDelete(index, row) {
+                MessageBox.confirm('是否确认删除医生', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let res = await deleteDoctor(row.dID);
+                    this.tableData = [];
+                    this.find_doc();
+                    console.log(res);
+                    if (res.status == 200) {
+                        Message({
+                            type: 'success',
+                            message: '删除医生成功!'
+                        });
+                    }
+
+                }).catch(() => {
+                    Message({
+                        type: 'info',
+                        message: '已取消操作'
+                    });
+                });
             },
             handleSchedule(index, row) {
                 this.docID = row.dID;
@@ -259,7 +297,8 @@
     .el-textarea {
         width: 230px;
     }
-    .findDoc{
+
+    .findDoc {
         width: 160px;
         margin-right: 30px;
     }

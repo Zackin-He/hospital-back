@@ -1,6 +1,17 @@
 <template>
     <div class="departments">
-        <el-table :data="tableData" height="500px" border style="width: 100%">
+        <el-form style="margin-bottom:25px" :model="findForm" label-width="80px">
+            <span>科室ID：</span>
+            <el-input v-model="findForm.id" placeholder="请输入科室ID" class="findDoc"></el-input>
+            <span>科室名：</span>
+            <el-input v-model="findForm.name" placeholder="请输入科室名" class="findDoc"></el-input>
+            <span>所属门诊：</span>
+            <el-select v-model="findForm.department" clearable class="findDoc" placeholder="请选择门诊部门">
+                <el-option v-for="(item,index) in options" :key="index" :label="item.department" :value="item.department"></el-option>
+            </el-select>
+            <el-button style="margin-left:30px;float:right" @click="find_specialty" type="primary">查询科室</el-button>
+        </el-form>
+        <el-table :data="tableData" height="440px" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
             <el-table-column prop="s_name" label="科室名" width="160">
@@ -13,8 +24,10 @@
             </el-table-column>
             <el-table-column label="操作" width="160">
                 <template slot-scope="scope">
-                    <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="mini" :disabled="scope.row.s_id==='0000'"
+                        @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    <el-button size="mini" :disabled="scope.row.s_id==='0000'" type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除</el-button>
 
                 </template>
             </el-table-column>
@@ -45,11 +58,13 @@
 
 <script>
     import {
-        Message
+        Message,
+        MessageBox
     } from "element-ui";
     import {
         getDepartments,
-        changeSpecailty
+        changeSpecailty,
+        deleteSpecialty
     } from '@/service/api/index'
     export default {
         data() {
@@ -62,9 +77,16 @@
                     specialty_d: '',
                     specialty_intro: ''
                 },
+                findForm: {
+                    id: '',
+                    name: '',
+                    department: '',
+
+                },
                 formLabelWidth: '120px',
                 departments: [],
-                oldDepartment: ''
+                oldDepartment: '',
+                options:[],
             }
         },
         mounted() {
@@ -73,6 +95,7 @@
         methods: {
             async get_departments() {
                 let res = await getDepartments();
+                this.options = res.data;
                 console.log(res);
                 this.departments = res.data
                 res.data.forEach(item => {
@@ -98,6 +121,25 @@
                 console.log(index, row);
             },
             handleDelete(index, row) {
+                MessageBox.confirm('是否确认删除科室', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let res = await deleteSpecialty(row.s_id, row.s_d);
+                    this.tableData = [];
+                    this.get_departments();
+                    console.log(res);
+                    Message({
+                        type: 'success',
+                        message: '删除科室成功!'
+                    });
+                }).catch(() => {
+                    Message({
+                        type: 'info',
+                        message: '已取消操作'
+                    });
+                });
                 console.log(index, row);
             },
             async changeSpecialty() {
@@ -114,6 +156,30 @@
                     });
                 }
                 this.dialogFormVisible = false
+            },
+            find_specialty() {
+                this.tableData = []
+                let keyword1 = this.findForm.department;
+                let keyword2 = this.findForm.id;
+                let keyword3 = this.findForm.name;
+                let reg1 = new RegExp(keyword1);
+                let reg2 = new RegExp(keyword2);
+                let reg3 = new RegExp(keyword3);
+                this.departments.forEach(item => {
+                    if (item.department.match(reg1)) {
+                        item.specialty.forEach(item2 => {
+                            if (item2.specialty_name.match(reg3) && item2.specialty_id.match(reg2)) {
+                                this.tableData.push({
+                                    s_name: item2.specialty_name,
+                                    s_id: item2.specialty_id,
+                                    s_d: item.department,
+                                    s_intro: item2.introduction
+                                })
+                            }
+                        })
+                    }
+
+                });
             }
         }
     }
@@ -123,13 +189,22 @@
     .departments {
         text-align: start;
     }
+
     .el-dialog__header {
         text-align: center;
     }
-    .el-input,.el-select{
-    width: 350px;
-  }
-  .el-textarea{
-    width: 350px;
-  }
+
+    .el-input,
+    .el-select {
+        width: 350px;
+    }
+
+    .el-textarea {
+        width: 350px;
+    }
+
+    .findDoc {
+        width: 180px;
+        margin-right: 30px;
+    }
 </style>

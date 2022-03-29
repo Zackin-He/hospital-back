@@ -37,4 +37,17 @@ export const changeDoctor = (dID,dName,dGender,s_id,s_name,introduction,docTitle
 export const addDepartment = (departmentName)=>ajax(BASE_URL+'/web/api/addDepartment',{departmentName},'post');
 //添加科室
 export const addSpecialty = (departmentName,specialtyName,specialtyID,introduction)=>ajax(BASE_URL+'/web/api/addSpecialty',{departmentName,specialtyName,specialtyID,introduction},'post');
+//根据条件查询医师
 export const findDoc = (dName,dSpecialty,dTitle)=>ajax(BASE_URL+'/web/api/getDoctorsByCondition',{dName,dSpecialty,dTitle},'post');
+//删除医生
+export const deleteDoctor = (dID)=>ajax(BASE_URL+'/web/api/deleteDoctor',{dID},'post');
+//删除科室
+export const deleteSpecialty = (specialtyID,departmentName)=>ajax(BASE_URL+'/web/api/deleteSpecialty',{specialtyID,departmentName},'post');
+//获取预约单
+export const getOrders = ()=>ajax(BASE_URL+'/web/api/getOrders');
+//根据条件查询订单
+export const getOrdersByCondition = (regNumber,pName,pDocName,dpmt)=>ajax(BASE_URL+'/web/api/getOrdersByCondition',{regNumber,pName,pDocName,dpmt},'post');
+//根据医生id查询订单
+export const getOrdersByDocID = (dID)=>ajax(BASE_URL+'/web/api/getOrdersByDocID',{dID},'post');
+// getOrdersByConditionAndID
+export const getOrdersByConditionAndID = (regNumber,pName,docID)=>ajax(BASE_URL+'/web/api/getOrdersByConditionAndID',{regNumber,pName,docID},'post');

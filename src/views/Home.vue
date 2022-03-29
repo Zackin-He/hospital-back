@@ -53,7 +53,6 @@
                   <span>预约挂号管理</span>
                 </template>
                 <el-menu-item index="4-1">查询挂号单</el-menu-item>
-                <el-menu-item index="4-2">添加挂号单</el-menu-item>
               </el-submenu>
             </div>
             <div v-else-if="user_type=='doctor'">
@@ -62,8 +61,15 @@
                   <i class="el-icon-user-solid"></i>
                   <span>医生管理</span>
                 </template>
-                <el-menu-item index="2-1">医生管理</el-menu-item>
-                <el-menu-item index="2-2">医生添加</el-menu-item>
+                <el-menu-item index="2-1">医生查询</el-menu-item>
+                <el-menu-item index="2-3">个人排班</el-menu-item>
+              </el-submenu>
+              <el-submenu index="4">
+                <template slot="title">
+                  <i class="el-icon-s-promotion"></i>
+                  <span>预约挂号管理</span>
+                </template>
+                <el-menu-item index="4-1">查询挂号单</el-menu-item>
               </el-submenu>
             </div>
           </el-menu>
@@ -145,6 +151,7 @@
         }).then(async () => {
           let res = await logout();
           localStorage.setItem('token', '');
+          localStorage.setItem('user_type','')
           this.$router.push('/login')
           console.log(res);
           Message({
