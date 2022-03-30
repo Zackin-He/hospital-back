@@ -13,7 +13,7 @@
             </div>
             <div class="nav_info_name"><span>{{userInfo.username}}</span></div>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-edit">修改信息</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-edit" command="changePwd">修改密码</el-dropdown-item>
               <el-dropdown-item icon="el-icon-switch-button" command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -79,6 +79,20 @@
         </el-main>
       </el-container>
     </el-container>
+    <el-dialog title="修改密码" width="500px" :visible.sync="isShow">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="旧密码">
+          <el-input v-model="form.oldPwd" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="form.newPwd" show-password></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShow = false">取 消</el-button>
+        <el-button type="primary" @click="change_pwd">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -96,17 +110,26 @@
   } from 'vuex'
   import {
     getUserInfo,
-    logout
+    logout,
+    changeDocPwd
   } from '@/service/api/index'
   export default {
     data() {
       return {
-        user_type: ''
+        user_type: '',
+        isShow: false,
+        form: {
+          oldPwd:'',
+          newPwd:''
+        }
       }
     },
     components: {},
     computed: {
       ...mapState(['userInfo']),
+    },
+    created() {
+      this.user_type = localStorage.getItem('user_type')
     },
     mounted() {
       this.get_user_info()
@@ -122,8 +145,8 @@
       handleCommand(command) {
         if (command == 'logout') {
           this.login_out()
-        } else {
-          alert('修改信息')
+        } else if (command == 'changePwd') {
+          this.isShow = true
         }
       },
       selectMenu(index, indexPath) {
@@ -138,9 +161,25 @@
         let res = await getUserInfo();
         if (res.status === 200) {
           console.log(res);
-          this.user_type = res.data.type;
+          // this.user_type = res.data.type;
           this.user_info(res.data);
           console.log(res.data);
+        }
+      },
+      async change_pwd(){
+        let token = localStorage.getItem('token')
+        let res = await changeDocPwd(token,this.form.oldPwd,this.form.newPwd);
+        if (res.status===200) {
+          Message({
+            type: 'success',
+            message: '修改密码成功!'
+          });
+          this.isShow = false
+        }else{
+          Message({
+            type: 'error',
+            message: '旧密码不正确!'
+          });
         }
       },
       login_out() {
@@ -151,7 +190,7 @@
         }).then(async () => {
           let res = await logout();
           localStorage.setItem('token', '');
-          localStorage.setItem('user_type','')
+          localStorage.setItem('user_type', '')
           this.$router.push('/login')
           console.log(res);
           Message({

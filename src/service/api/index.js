@@ -51,3 +51,4 @@ export const getOrdersByCondition = (regNumber,pName,pDocName,dpmt)=>ajax(BASE_U
 export const getOrdersByDocID = (dID)=>ajax(BASE_URL+'/web/api/getOrdersByDocID',{dID},'post');
 // getOrdersByConditionAndID
 export const getOrdersByConditionAndID = (regNumber,pName,docID)=>ajax(BASE_URL+'/web/api/getOrdersByConditionAndID',{regNumber,pName,docID},'post');
+export const changeDocPwd = (token,oldPwd,newPwd)=>ajax(BASE_URL+'/web/api/changeDocPwd',{token,oldPwd,newPwd},'post');
