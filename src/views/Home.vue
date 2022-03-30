@@ -146,7 +146,16 @@
         if (command == 'logout') {
           this.login_out()
         } else if (command == 'changePwd') {
-          this.isShow = true
+          let type = localStorage.getItem('user_type')
+          if (type=='doctor') {
+            this.isShow = true
+          }else{
+            Message({
+            type: 'warning',
+            message: '此功能暂未开放!'
+          });
+          }
+          
         }
       },
       selectMenu(index, indexPath) {
