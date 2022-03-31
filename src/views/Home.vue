@@ -25,15 +25,15 @@
       <el-container>
         <el-aside width="200px">
           <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-            @select="selectMenu" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+            @select="selectMenu" background-color="rgba(255, 255, 255, 0)" style="border:none" text-color="#303133" active-text-color="#409eff">
             <el-menu-item index="1">
-              <i class="el-icon-s-home"></i>
+              <i class="el-icon-s-home" style="color:#0ff"></i>
               <span slot="title">首页</span>
             </el-menu-item>
             <div class="admin" v-if="user_type=='admin'">
               <el-submenu index="2">
                 <template slot="title">
-                  <i class="el-icon-user-solid"></i>
+                  <i class="el-icon-user-solid" style="color:#d2691e"></i>
                   <span>医生管理</span>
                 </template>
                 <el-menu-item index="2-1">医生管理</el-menu-item>
@@ -41,7 +41,7 @@
               </el-submenu>
               <el-submenu index="3">
                 <template slot="title">
-                  <i class="el-icon-menu"></i>
+                  <i class="el-icon-menu" style="color:#0ff"></i>
                   <span>科室管理</span>
                 </template>
                 <el-menu-item index="3-1">科室管理</el-menu-item>
@@ -49,7 +49,7 @@
               </el-submenu>
               <el-submenu index="4">
                 <template slot="title">
-                  <i class="el-icon-s-promotion"></i>
+                  <i class="el-icon-s-promotion" style="color:#9400d3"></i>
                   <span>预约挂号管理</span>
                 </template>
                 <el-menu-item index="4-1">查询挂号单</el-menu-item>
@@ -58,7 +58,7 @@
             <div v-else-if="user_type=='doctor'">
               <el-submenu index="2">
                 <template slot="title">
-                  <i class="el-icon-user-solid"></i>
+                  <i class="el-icon-user-solid" style="color:#d2691e"></i>
                   <span>医生管理</span>
                 </template>
                 <el-menu-item index="2-1">医生查询</el-menu-item>
@@ -66,7 +66,7 @@
               </el-submenu>
               <el-submenu index="4">
                 <template slot="title">
-                  <i class="el-icon-s-promotion"></i>
+                  <i class="el-icon-s-promotion" style="color:#9400d3"></i>
                   <span>预约挂号管理</span>
                 </template>
                 <el-menu-item index="4-1">查询挂号单</el-menu-item>
@@ -239,6 +239,7 @@
   }
 
   .home>.el-container {
+    background: -webkit-linear-gradient(180deg,rgba(255,0,145,.08),rgba(170,0,255,.07));
     position: absolute;
     height: 100vh;
     width: 100%;
@@ -278,7 +279,7 @@
   .nav_left {
     width: 200px;
     height: 100%;
-    background-color: #367FA9;
+    background-color: pink;
   }
 
   .nav_right {
@@ -290,29 +291,38 @@
   }
 
   .el-header {
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
     padding: 0 !important;
-    background-color: #4AB7BD;
+    background: -webkit-linear-gradient(40deg,rgba(255,0,102,.18),rgba(255,0,8,.2));
     color: #333;
     /* text-align: center; */
     height: 60px;
   }
 
   .el-aside {
-    background-color: #D3DCE6;
+    box-sizing: border-box;
+    border: 1px solid #add8e6;
+    background-color: rgba(255, 255, 255);
+    opacity: 0.7;
     color: #333;
     text-align: center;
     height: 100%;
   }
 
-  .el-menu {
+  ::v-deep .el-menu {
     height: 100%;
+    background-color: #fff !important;
   }
 
   .el-submenu__title {
     text-align: start;
   }
 
-  .el-menu-item {
+  ::v-deep .el-menu-item {
+     background-color: rgba(255, 255, 255, 0);
+    
+  }
+  .el-menu-item{
     text-align: start;
   }
 
@@ -322,7 +332,7 @@
   }
 
   .el-main {
-    background-color: #E9EEF3;
+    /* background: -webkit-linear-gradient(180deg,rgba(255,0,145,.08),rgba(170,0,255,.07)); */
     color: #333;
     text-align: center;
     height: 100%

@@ -73,6 +73,9 @@
             message: '添加门诊成功！',
             type: 'success'
           });
+          this.departmentName = ''
+          let res = await getDepartments();
+          this.options = res.data;
         } else {
           Message({
             showClose: true,
@@ -114,6 +117,7 @@
             message: '添加科室成功！',
             type: 'success'
           });
+          this.$router.push('/departments')
         }else{
           Message({
             showClose: true,
