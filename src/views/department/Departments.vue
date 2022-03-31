@@ -11,7 +11,7 @@
             </el-select>
             <el-button style="margin-left:30px;float:right" @click="find_specialty" type="primary">查询科室</el-button>
         </el-form>
-        <el-table :data="tableData" height="75vh" border style="width: 100%">
+        <el-table :data="pageData" height="67vh" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
             <el-table-column prop="s_name" label="科室名" width="160">
@@ -32,6 +32,14 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+            :hide-on-single-page="tableData.length<=7"
+            background
+            @current-change="changePage"
+            :page-size="7"
+            layout="prev, pager, next"
+            :total="tableData.length">
+        </el-pagination>
         <el-dialog title="编辑科室" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="科室名称" :label-width="formLabelWidth">
@@ -70,6 +78,7 @@
         data() {
             return {
                 tableData: [],
+                pageData:[],
                 dialogFormVisible: false,
                 form: {
                     specialty_id: '',
@@ -108,6 +117,7 @@
                         })
                     })
                 });
+                this.pageData = this.tableData.slice(0,7)
                 console.log(this.tableData);
             },
             handleEdit(index, row) {
@@ -180,6 +190,12 @@
                     }
 
                 });
+                this.pageData = this.tableData.slice(0,7)
+            },
+            changePage(page){
+                this.pageData = this.tableData.slice((page-1)*7,page*7);
+                console.log(this.pageData);
+                console.log(page);
             }
         }
     }
@@ -206,5 +222,8 @@
     .findDoc {
         width: 180px;
         margin-right: 30px;
+    }
+    .el-pagination{
+        text-align: end;
     }
 </style>

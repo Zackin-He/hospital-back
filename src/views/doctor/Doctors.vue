@@ -16,7 +16,7 @@
             </el-cascader>
             <el-button style="margin-left:30px;float:right" @click="find_doc" type="primary">查询医师</el-button>
         </el-form>
-        <el-table :data="tableData" height="75vh" border style="width: 100%">
+        <el-table :data="pageData" height="67vh" border style="width: 100%">
             <el-table-column type="index" width="50">
             </el-table-column>
             <el-table-column prop="dName" label="姓名" width="120">
@@ -43,6 +43,14 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+            :hide-on-single-page="tableData.length<=7"
+            background
+            @current-change="changePage"
+            :page-size="7"
+            layout="prev, pager, next"
+            :total="tableData.length">
+        </el-pagination>
         <el-dialog width="800px" title="修改医生信息" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-row>
@@ -120,6 +128,7 @@
         data() {
             return {
                 tableData: [],
+                pageData:[],
                 doctor: null,
                 dialogFormVisible: false,
                 scheduleShow: false,
@@ -162,7 +171,8 @@
             async get_doctors() {
                 let res = await getDoctors();
                 if (res.status === 200) {
-                    this.tableData = res.doc
+                    this.tableData = res.doc;
+                    this.pageData = this.tableData.slice(0,7)
                 }
                 console.log(res.doc);
             },
@@ -219,7 +229,8 @@
                     res = await findDoc(this.findForm.name, '', this.findForm.docTitle);
                 }
                 if (res.status === 200) {
-                    this.tableData = res.data
+                    this.tableData = res.data;
+                    this.pageData = this.tableData.slice(0,7)
                 }
                 console.log(res);
             },
@@ -273,6 +284,11 @@
             },
             handleChange(value) {
                 console.log(value);
+            },
+            changePage(page){
+                this.pageData = this.tableData.slice((page-1)*7,page*7);
+                console.log(this.pageData);
+                console.log(page);
             }
 
         }
@@ -305,5 +321,8 @@
 
     .el-form-item__label {
         width: 120px !important;
+    }
+    .el-pagination{
+        text-align: end;
     }
 </style>

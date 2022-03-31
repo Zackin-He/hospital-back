@@ -18,7 +18,7 @@
             </el-dropdown-menu>
           </el-dropdown>
 
-          <!-- <button @click="login_out">退出登录</button> -->
+
 
         </div>
       </el-header>

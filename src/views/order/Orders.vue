@@ -15,7 +15,7 @@
       </span>
       <el-button style="margin-left:15px;float:right" @click="find_orders" type="primary">查询</el-button>
     </el-form>
-    <el-table :data="tableData" style="width: 100%" height="75vh">
+    <el-table :data="pageData" style="width: 100%" height="67vh">
       <el-table-column prop="regNumber" label="预约单号" width="150">
       </el-table-column>
       <el-table-column prop="pName" label="患者姓名" width="140">
@@ -31,6 +31,14 @@
       <el-table-column prop="treatTime" label="就诊时间">
       </el-table-column>
     </el-table>
+    <el-pagination
+            :hide-on-single-page="tableData.length<=7"
+            background
+            @current-change="changePage"
+            :page-size="7"
+            layout="prev, pager, next"
+            :total="tableData.length">
+        </el-pagination>
   </div>
 </template>
 
@@ -49,6 +57,7 @@
     data() {
       return {
         tableData: [],
+        pageData:[],
         findForm: {
           regNumber: '',
           pName: '',
@@ -102,6 +111,7 @@
             treatTime: newTime
           })
         });
+        this.pageData = this.tableData.slice(0,7)
         console.log(res);
       },
       add0(m) {
@@ -168,12 +178,18 @@
               treatTime: newTime
             })
           });
+          this.pageData = this.tableData.slice(0,7)
         }
         console.log(res);
       },
       handleChange(value) {
         console.log(value);
-      }
+      },
+      changePage(page){
+                this.pageData = this.tableData.slice((page-1)*7,page*7);
+                console.log(this.pageData);
+                console.log(page);
+            }
     }
   }
 </script>
@@ -187,4 +203,7 @@
     width: 130px;
     margin-right: 10px;
   }
+  .el-pagination{
+        text-align: end;
+    }
 </style>
