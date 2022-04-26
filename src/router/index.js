@@ -54,6 +54,11 @@ const routes = [
         return import(/* webpackChunkName: "addDoctor" */ '../views/order/Orders.vue')
       },meta: {
         roles: ['admin','doctor']
+      }},
+      {path:'/orderStatistics',name:'orderStatistics',component: function () {
+        return import(/* webpackChunkName: "addDoctor" */ '../views/order/OrderStatistics.vue')
+      },meta: {
+        roles: ['admin','doctor']
       }}
     ]
   },

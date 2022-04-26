@@ -7,6 +7,10 @@ import { Button,Container,Header,Main,Aside,Menu,MenuItem,Submenu,MenuItemGroup,
   Dialog,Form,FormItem,Input,Select,Option,Col,Cascader,Avatar,Dropdown,DropdownItem,Pagination,DropdownMenu,Row,Card, Radio
   } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+//全局引入echarts
+import * as echarts from 'echarts';
+//需要挂载到Vue原型上
+Vue.prototype.$echarts = echarts
 
 Vue.use(VCalendar,{
   componentPrefix: 'vc',

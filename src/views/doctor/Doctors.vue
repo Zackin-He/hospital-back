@@ -96,10 +96,10 @@
         </el-dialog>
         <el-dialog width="1050px" title="医生排班" :visible.sync="scheduleShow">
             <Calendar :dID="docID" :schedule1="schedule" :key="docID" />
-            <div slot="footer" class="dialog-footer">
+            <!-- <div slot="footer" class="dialog-footer">
                 <el-button @click="scheduleShow = false">取 消</el-button>
                 <el-button type="primary" @click="scheduleShow = false">确 定</el-button>
-            </div>
+            </div> -->
         </el-dialog>
     </div>
 </template>

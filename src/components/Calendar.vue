@@ -4,7 +4,7 @@
       <vc-calendar :attributes="attributes" :min-date='new Date()' is-expanded :disabled-dates='disableArray'
         @dayclick="onDayClick" @transition-start="move"/>
     </div>
-    <el-button style="float:left" type="primary" @click="submit">确认排班</el-button>
+    <el-button style="margin-right:40px" type="primary" @click="submit">确认排班</el-button>
     <!-- <button @click="submit">提交</button> -->
   </div>
 </template>
@@ -121,9 +121,9 @@
   };
 </script>
 <style>
-  /* .calendar {
-    width: 1000px;
-  } */
+  .calendar {
+    text-align: center;
+  }
 
   .is-disabled {
     pointer-events: none;

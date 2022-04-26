@@ -36,7 +36,7 @@ export const menuList = [
       },
       {
         key: '4-2',
-        title: '挂号添加',
-        url:'/addOrder'
+        title: '挂号统计',
+        url:'/orderStatistics'
       },
   ];

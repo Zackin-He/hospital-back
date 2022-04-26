@@ -53,6 +53,7 @@
                   <span>预约挂号管理</span>
                 </template>
                 <el-menu-item index="4-1">查询挂号单</el-menu-item>
+                <el-menu-item index="4-2">挂号统计</el-menu-item>
               </el-submenu>
             </div>
             <div v-else-if="user_type=='doctor'">
