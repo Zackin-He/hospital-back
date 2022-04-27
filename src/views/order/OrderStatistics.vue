@@ -1,25 +1,91 @@
 <template>
-  <div>
-    <el-button @click="toggle">切换</el-button>
-    <div v-if="isShow" style="width: auto; height: 400px" id="main"></div>
-    <div v-if="!isShow" style="width: auto; height: 400px" id="main1"></div>
+  <div id="orderStatistics">
+    <div class="toggleBtn">
+      <el-button @click="getData(1)">未来七天预约统计</el-button>
+      <el-button @click="getData(2)">过去七天预约统计</el-button>
+      <el-button @click="getDataBySpecialty">各科室预约统计</el-button>
+    </div>
+    <div v-if="lineIsShow" style="width: auto; height: 450px" id="main"></div>
+    <div v-if="pieIsShow" style="width: auto; height: 450px" id="main1"></div>
   </div>
 </template>
 
 <script>
+import {getOrdersByDates,getOrdersBySpecialty} from '@/service/api/index'
 export default {
   name: "page",
   data() {
     return {
-      isShow: true,
+      lineIsShow: true,
+      pieIsShow:false,
       dateArray: [],
+      lineData:[],
+      nextDays:[],
+      pieData:[],
+      linePic:null,
+      piePic:null
     };
   },
   mounted() {
-    // 在通过mounted调用即可
-    this.echartsInit();
+    // this.getDays(1)
+    this.getData(1)
   },
   methods: {
+    async getData(type){
+      this.lineIsShow = false;
+      this.pieIsShow = false
+      this.$nextTick(async ()=>{
+        this.lineIsShow = true;
+        let res = await getOrdersByDates(type);
+        this.lineData = res.result;
+        this.getDays(type)
+        this.$nextTick(()=>{
+          this.echartsInit();
+        })
+      })
+    },
+    async getDataBySpecialty(){
+      this.lineIsShow = false;
+      this.pieIsShow = true
+      let res = await getOrdersBySpecialty();
+      console.log(res);
+      this.pieData = res.result;
+      this.$nextTick(()=>{
+        this.echartsInit1();
+      })
+    },
+    getDays(type){
+      this.nextDays = []
+      let todayTime = new Date().getTime();
+      let dayTime = 1000*60*60*24;
+      if (type==1) {
+        for (let i = 0; i < 7; i++) {
+        let date = new Date(todayTime+dayTime*i);
+        let month = date.getMonth()+1;
+        let day = date.getDate();
+        if (month>=1&&month<=9) {
+          month = '0' + month;
+        }
+        if (day>=1&&day<=9) {
+          day = '0' + day;
+        }
+        this.nextDays.push(month+'-'+day)
+      }
+      }else{
+        for (let i = 0; i < 7; i++) {
+        let date = new Date(todayTime-dayTime*i);
+        let month = date.getMonth()+1;
+        let day = date.getDate();
+        if (month>=1&&month<=9) {
+          month = '0' + month;
+        }
+        if (day>=1&&day<=9) {
+          day = '0' + day;
+        }
+        this.nextDays.unshift(month+'-'+day)
+      }
+      }
+    },
     //初始化echarts
     echartsInit() {
       //柱形图
@@ -27,14 +93,14 @@ export default {
       this.$echarts.init(document.getElementById("main")).setOption({
         xAxis: {
           type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          data: this.nextDays,
         },
         yAxis: {
           type: "value",
         },
         series: [
           {
-            data: [120, 200, 150, 80, 70, 110, 130, 300],
+            data: this.lineData,
             type: "line",
             showBackground: true,
             backgroundStyle: {
@@ -56,7 +122,7 @@ export default {
           show: true,
           feature: {
             mark: { show: true },
-            dataView: { show: true, readOnly: false },
+            dataView: { show: false, readOnly: false },
             restore: { show: true },
             saveAsImage: { show: true },
           },
@@ -65,51 +131,50 @@ export default {
           {
             name: "Nightingale Chart",
             type: "pie",
-            radius: [50, 250],
-            center: ["50%", "50%"],
+            radius: ['30%','70%'],
+            center: ['50%', '50%'],
+            label: {
+			        normal: {
+				      show: true,
+				      // position: 'inner', // 数值显示在内部
+				      formatter: '{b}：{d}%', // 格式化数值百分比输出
+			        },
+		        },
             roseType: "area",
             itemStyle: {
               borderRadius: 8,
             },
-            data: [
-              { value: 40, name: "rose 1" },
-              { value: 38, name: "rose 2" },
-              { value: 32, name: "rose 3" },
-              { value: 30, name: "rose 4" },
-              { value: 28, name: "rose 5" },
-              { value: 26, name: "rose 6" },
-              { value: 22, name: "rose 7" },
-              { value: 18, name: "rose 8" },
-              { value: 40, name: "rose 9" },
-              { value: 38, name: "rose 10" },
-              { value: 32, name: "rose 11" },
-              { value: 30, name: "rose 12" },
-              { value: 28, name: "rose 13" },
-              { value: 26, name: "rose 14" },
-              { value: 22, name: "rose 15" },
-              { value: 18, name: "rose 16" },
-            ],
+            data: this.pieData,
           },
         ],
       },true);
     },
-    toggle() {
-      this.isShow = !this.isShow;
-      if (this.isShow == true) {
-        this.$nextTick(() => {
-          this.echartsInit();
-        });
-      } else {
-        this.$nextTick(() => {
-          this.echartsInit1();
-        });
-      }
+    // toggle() {
+    //   this.isShow = !this.isShow;
+    //   if (this.isShow == true) {
+    //     this.$nextTick(() => {
+    //       this.getData(1);
+    //     });
+    //   } else {
+    //     this.$nextTick(() => {
+    //       this.getDataBySpecialty()
+    //     });
+    //   }
 
-      console.log(this.isShow);
-    },
+    //   console.log(this.isShow);
+    // },
   },
 };
 </script>
 
 <style>
+#orderStatistics{
+  position: relative;
+}
+.toggleBtn{
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 </style>
