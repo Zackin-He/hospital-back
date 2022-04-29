@@ -1,9 +1,9 @@
 <template>
   <div id="orderStatistics">
     <div class="toggleBtn">
-      <el-button @click="getData(1)">未来七天预约统计</el-button>
-      <el-button @click="getData(2)">过去七天预约统计</el-button>
-      <el-button @click="getDataBySpecialty">各科室预约统计</el-button>
+      <el-button @click="getData(1)" plain autofocus>未来七天预约统计</el-button>
+      <el-button @click="getData(2)" plain>过去七天预约统计</el-button>
+      <el-button @click="getDataBySpecialty" plain>各科室预约统计</el-button>
     </div>
     <div v-if="lineIsShow" style="width: auto; height: 450px" id="main"></div>
     <div v-if="pieIsShow" style="width: auto; height: 450px" id="main1"></div>
@@ -91,6 +91,9 @@ export default {
       //柱形图
       //因为初始化echarts 的时候，需要指定的容器 id='main'
       this.$echarts.init(document.getElementById("main")).setOption({
+        tooltip: {
+          trigger: 'axis'
+        },
         xAxis: {
           type: "category",
           data: this.nextDays,
@@ -117,6 +120,10 @@ export default {
       this.$echarts.init(document.getElementById("main1")).setOption({
         legend: {
           top: "bottom",
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '预约分布图 <br/>{b} : {c} ({d}%)'
         },
         toolbox: {
           show: true,
