@@ -9,11 +9,14 @@
         <div class="nav_info">
           <el-dropdown @command="handleCommand">
             <div class="nav_info_icon">
-              <el-avatar icon="el-icon-user-solid"></el-avatar>
+              <el-avatar v-if="user_type=='admin'" icon="el-icon-user-solid"></el-avatar>
+              <img v-if="user_type=='doctor'" :src="form.imgUrl" style="width:45px;height:45px;border-radius:50%"
+                alt="">
             </div>
             <div class="nav_info_name"><span>{{userInfo.username}}</span></div>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-edit" command="changePwd">修改密码</el-dropdown-item>
+              <el-dropdown-item v-if="user_type=='doctor'" icon="el-icon-lock" command="changePwd">修改密码</el-dropdown-item>
+              <el-dropdown-item v-if="user_type=='doctor'" icon="el-icon-edit" command="changeDoc">修改信息</el-dropdown-item>
               <el-dropdown-item icon="el-icon-switch-button" command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -25,7 +28,8 @@
       <el-container>
         <el-aside width="200px">
           <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-            @select="selectMenu" background-color="rgba(255, 255, 255, 0)" style="border:none" text-color="#303133" active-text-color="#409eff">
+            @select="selectMenu" background-color="rgba(255, 255, 255, 0)" style="border:none" text-color="#303133"
+            active-text-color="#409eff">
             <el-menu-item index="1">
               <i class="el-icon-s-home" style="color:#0ff"></i>
               <span slot="title">首页</span>
@@ -81,17 +85,63 @@
       </el-container>
     </el-container>
     <el-dialog title="修改密码" width="500px" :visible.sync="isShow">
-      <el-form ref="form" :model="form" label-width="80px">
+      <el-form ref="form" :model="form1" label-width="80px">
         <el-form-item label="旧密码">
-          <el-input v-model="form.oldPwd" show-password></el-input>
+          <el-input v-model="form1.oldPwd" show-password></el-input>
         </el-form-item>
         <el-form-item label="新密码">
-          <el-input v-model="form.newPwd" show-password></el-input>
+          <el-input v-model="form1.newPwd" show-password></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShow = false">取 消</el-button>
         <el-button type="primary" @click="change_pwd">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog width="800px" title="修改医生信息" :visible.sync="changeShow">
+      <el-form :model="form">
+        <el-row>
+          <el-col :span="12">
+            <div class="grid-content bg-purple">
+              <el-form-item label="医生姓名" :label-width="formLabelWidth">
+                <el-input v-model="form.name" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="性别" :label-width="formLabelWidth">
+                <el-input v-model="form.gender" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="医生简介" :label-width="formLabelWidth">
+                <el-input type="textarea" :rows="1" placeholder="请输入内容" v-model="form.introduction">
+                </el-input>
+              </el-form-item>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="grid-content bg-purple-light">
+              <el-form-item label="所属科室" :label-width="formLabelWidth">
+                <el-cascader v-model="value" placeholder="请选择科室" :options="options" :props="{ expandTrigger: 'hover' }">
+                </el-cascader>
+              </el-form-item>
+              <el-form-item label="医生职称" :label-width="formLabelWidth">
+                <el-select v-model="form.docTitle" placeholder="请选择医生职称">
+                  <el-option label="主任医师" value="主任医师"></el-option>
+                  <el-option label="副主任医师" value="副主任医师"></el-option>
+                  <el-option label="主治医师" value="主治医师"></el-option>
+                  <el-option label="副主治医师" value="副主治医师"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="医生头像" :label-width="formLabelWidth">
+                  <van-uploader :after-read="afterRead" />
+                  <img :src="form.imgUrl" style="width:80px;height:80px" alt="">
+              </el-form-item>
+            </div>
+          </el-col>
+        </el-row>
+
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="changeShow = false">取 消</el-button>
+        <el-button type="primary" @click="change_doctor">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -112,17 +162,31 @@
   import {
     getUserInfo,
     logout,
-    changeDocPwd
+    changeDocPwd,
+    getDepartments,
+    changeDoctor
   } from '@/service/api/index'
   export default {
     data() {
       return {
         user_type: '',
         isShow: false,
+        changeShow: false,
+        form1: {
+          oldPwd: '',
+          newPwd: ''
+        },
         form: {
-          oldPwd:'',
-          newPwd:''
-        }
+          name: '',
+          gender: '',
+          introduction: '',
+          docTitle: '',
+          imgUrl:''
+        },
+        formLabelWidth: '120px',
+        options: [],
+        value: [],
+        doctor:null
       }
     },
     components: {},
@@ -131,8 +195,10 @@
     },
     created() {
       this.user_type = localStorage.getItem('user_type')
+
     },
     mounted() {
+      this.get_departments()
       this.get_user_info()
     },
     methods: {
@@ -148,16 +214,41 @@
           this.login_out()
         } else if (command == 'changePwd') {
           let type = localStorage.getItem('user_type')
-          if (type=='doctor') {
+          if (type == 'doctor') {
             this.isShow = true
-          }else{
+          } else {
             Message({
-            type: 'warning',
-            message: '此功能暂未开放!'
-          });
+              type: 'warning',
+              message: '此功能暂未开放!'
+            });
           }
-          
+
+        } else if (command == 'changeDoc') {
+                  this.changeShow = true
         }
+      },
+      getDoc(){
+          console.log(this.userInfo);
+          this.form.name = this.userInfo.doc.dName;
+          this.form.gender = this.userInfo.doc.dGender;
+          this.form.introduction = this.userInfo.doc.dIntroduction;
+          this.form.docTitle = this.userInfo.doc.docTitle;
+          if (this.userInfo.doc.dImage) {
+                    this.form.fileList = [
+                        {url:this.userInfo.doc.dImage,isImage:true}
+                    ];
+                    this.form.imgUrl = this.userInfo.doc.dImage
+                }else{
+                    this.form.fileList = [];
+                    this.form.imgUrl = '/img/pic1.ed125c38.png'
+          }
+          this.dDepartmentList.forEach(item => {
+                    item.specialty.forEach(item2 => {
+                        if (item2.specialty_id == this.doctor.doc.dPmtid) {
+                            this.value = [item.department, item2.specialty_id];
+                        }
+                    })
+                });
       },
       selectMenu(index, indexPath) {
         menuList.forEach(item => {
@@ -171,26 +262,74 @@
         let res = await getUserInfo();
         if (res.status === 200) {
           console.log(res);
+          this.doctor = res.data
+          console.log(this.doctor);
           // this.user_type = res.data.type;
           this.user_info(res.data);
+          if (res.data.type=='doctor') {
+            this.getDoc()
+          }
+          
           console.log(res.data);
         }
       },
-      async change_pwd(){
+      async change_pwd() {
         let token = localStorage.getItem('token')
-        let res = await changeDocPwd(token,this.form.oldPwd,this.form.newPwd);
-        if (res.status===200) {
+        let res = await changeDocPwd(token, this.form1.oldPwd, this.form1.newPwd);
+        if (res.status === 200) {
           Message({
             type: 'success',
             message: '修改密码成功!'
           });
           this.isShow = false
-        }else{
+        } else {
           Message({
             type: 'error',
             message: '旧密码不正确!'
           });
         }
+      },
+      async get_departments() {
+        let res = await getDepartments();
+        this.dDepartmentList = res.data;
+        console.log(this.dDepartmentList);
+        this.dDepartmentList.forEach(item => {
+          let obj = {};
+          obj.value = item.department;
+          obj.label = item.department;
+          obj.children = [];
+          item.specialty.forEach(item => {
+            obj.children.push({
+              value: item.specialty_id,
+              label: item.specialty_name
+            })
+          });
+          this.options.push(obj)
+        });
+        console.log(this.options);
+      },
+      async change_doctor() {
+        let s_name;
+        this.dDepartmentList.forEach((item) => {
+          item.specialty.forEach((item2) => {
+            if (item2.specialty_id === this.value[1]) {
+              s_name = item2.specialty_name;
+              return
+            }
+          })
+        })
+        let res = await changeDoctor(this.doctor.dID, this.form.name, this.form.gender, this.value[1],
+          s_name, this.form.introduction, this.form.docTitle,this.form.imgUrl);
+        console.log(res);
+        if (res.status == 200) {
+          this.tableData = [];
+          this.get_user_info();
+          Message({
+            message: '修改医生信息成功!',
+            type: 'success'
+          });
+        }
+        this.changeShow = false
       },
       login_out() {
         MessageBox.confirm('是否确认退出登录', '提示', {
@@ -214,7 +353,16 @@
           });
         });
 
-      }
+      },
+      async afterRead(file) {
+              // 此时可以自行将文件上传至服务器
+                console.log(file);
+                this.form.imgUrl = file.content;
+                this.form.fileList = [{
+                    url: file.content,
+                    isImage: true
+                }];
+            },
     }
   }
 </script>
@@ -240,7 +388,7 @@
   }
 
   .home>.el-container {
-    background: -webkit-linear-gradient(180deg,rgba(255,0,145,.08),rgba(170,0,255,.07));
+    background: -webkit-linear-gradient(180deg, rgba(255, 0, 145, .08), rgba(170, 0, 255, .07));
     position: absolute;
     height: 100vh;
     width: 100%;
@@ -266,7 +414,7 @@
     float: left;
     width: 60px;
     height: 50px;
-    padding-top: 10px;
+    padding-top: 5px;
     text-align: center;
   }
 
@@ -294,7 +442,7 @@
   .el-header {
     box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
     padding: 0 !important;
-    background: -webkit-linear-gradient(40deg,rgba(255,0,102,.18),rgba(255,0,8,.2));
+    background: -webkit-linear-gradient(40deg, rgba(255, 0, 102, .18), rgba(255, 0, 8, .2));
     color: #333;
     /* text-align: center; */
     height: 60px;
@@ -320,10 +468,11 @@
   }
 
   ::v-deep .el-menu-item {
-     background-color: rgba(255, 255, 255, 0);
-    
+    background-color: rgba(255, 255, 255, 0);
+
   }
-  .el-menu-item{
+
+  .el-menu-item {
     text-align: start;
   }
 
@@ -342,4 +491,7 @@
   /* .el-avatar{
     margin-top: 10px;
   } */
+  .van-uploader{
+        float: left;
+    }
 </style>

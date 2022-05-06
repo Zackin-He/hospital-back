@@ -1,10 +1,16 @@
 <template>
   <div>
     <div class="calendar">
-      <vc-calendar :attributes="attributes" :min-date='new Date()' is-expanded :disabled-dates='disableArray'
-        @dayclick="onDayClick" @transition-start="move"/>
+      <div style="margin-bottom:30px">
+        <span>09:00~10:00</span><el-input-number class="numInput" v-model="form.am1" :min="1" :max="100" label="描述文字"></el-input-number>
+        <span>10:00~11:00</span><el-input-number class="numInput" v-model="form.am2" :min="1" :max="100" label="描述文字"></el-input-number>
+        <span>14:00~15:00</span><el-input-number class="numInput" v-model="form.pm1" :min="1" :max="100" label="描述文字"></el-input-number>
+        <span>15:00~16:00</span><el-input-number class="numInput" v-model="form.pm2" :min="1" :max="100" label="描述文字"></el-input-number>
+      </div>
+      <vc-calendar :attributes="attributes" :min-date='new Date(new Date().getTime()+24*60*60*1000)' is-expanded :disabled-dates='disableArray'
+        @dayclick="onDayClick" @transition-start="move" />
     </div>
-    <el-button style="margin-right:40px" type="primary" @click="submit">确认排班</el-button>
+    <el-button style="margin-right:40px;margin-top:20px" type="primary" @click="submit">确认排班</el-button>
     <!-- <button @click="submit">提交</button> -->
   </div>
 </template>
@@ -12,15 +18,25 @@
 <script>
   // @ is an alias to /src
   import {
-    getDocById,scheduling
+    getDocById,
+    scheduling
   } from '@/service/api/index'
   export default {
-    props:{'dID':Number,'schedule1':Array},
+    props: {
+      'dID': Number,
+      'schedule1': Array
+    },
     data() {
       return {
         days: [],
         schedule: [],
-        disableArray: []
+        disableArray: [],
+        form: {
+          am1: 10,
+          am2: 10,
+          pm1: 10,
+          pm2: 10
+        }
       };
     },
     computed: {
@@ -34,17 +50,18 @@
         }));
       },
     },
-    created(){
+    created() {
       this.find()
     },
     mounted() {
       this.resetStyle()
     },
     methods: {
-      move(){
+      move() {
         this.resetStyle()
       },
       onDayClick(day) {
+        console.log(this.form);
         const idx = this.days.findIndex(d => d.id === day.id);
         if (idx >= 0) {
           this.days.splice(idx, 1);
@@ -55,21 +72,21 @@
             date: day.date,
           });
           this.schedule.push({
-            am1: 10,
-            am2: 10,
+            am1: this.form.am1,
+            am2: this.form.am2,
             date: parseInt(day.date.getTime()),
             isVisit: true,
-            pm1: 10,
-            pm2: 10
+            pm1: this.form.pm1,
+            pm2: this.form.pm2
           })
         }
-        console.log(this.schedule);
         // console.log(this.days);
         this.resetStyle()
       },
       resetStyle() {
         setTimeout(() => {
-          let div = document.querySelectorAll('.is-disabled');
+          let div = document.querySelectorAll('.is-disabled.vc-day-content');
+          console.log(div);
           for (let i = 0; i < div.length; i++) {
             let div1 = div[i].previousElementSibling
             if (div1) {
@@ -85,17 +102,15 @@
         if (!this.schedule1) {
           res = await getDocById(this.dID);
           this.schedule = res.doc[0].dScheduling;
-        }else{
+        } else {
           this.schedule = this.schedule1;
         }
-        console.log(this.schedule);
         for (let i = 0; i < this.schedule.length; i++) {
-          if (this.schedule[i].date < new Date(new Date().setHours(0, 0, 0, 0)).getTime()) {
+          if (this.schedule[i].date < new Date(new Date().setHours(0, 0, 0, 0)).getTime()+24*1000*60*60) {
             this.schedule.splice(i, 1);
             i--;
           }
         }
-        console.log(this.schedule);
         for (let i = 0; i < this.schedule.length; i++) {
           let obj = {
             date: String(new Date(this.schedule[i].date)),
@@ -108,11 +123,11 @@
         console.log(this.days);
         this.resetStyle();
       },
-      async submit(){
+      async submit() {
         console.log(this.schedule);
-        let res = await scheduling(this.dID,this.schedule);
-        this.schedule.forEach((item,index) => {
-            this.$set(this.disableArray, index, new Date(item.date))
+        let res = await scheduling(this.dID, this.schedule);
+        this.schedule.forEach((item, index) => {
+          this.$set(this.disableArray, index, new Date(item.date))
         });
         this.resetStyle()
         console.log(res);
@@ -127,5 +142,10 @@
 
   .is-disabled {
     pointer-events: none;
+  }
+  .numInput{
+    width: 130px;
+    margin-left: 10px;
+    margin-right: 25px;
   }
 </style>

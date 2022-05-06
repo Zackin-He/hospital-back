@@ -43,13 +43,8 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination
-            :hide-on-single-page="tableData.length<=7"
-            background
-            @current-change="changePage"
-            :page-size="7"
-            layout="prev, pager, next"
-            :total="tableData.length">
+        <el-pagination :hide-on-single-page="tableData.length<=7" background @current-change="changePage" :page-size="7"
+            layout="prev, pager, next" :total="tableData.length">
         </el-pagination>
         <el-dialog width="800px" title="修改医生信息" :visible.sync="dialogFormVisible">
             <el-form :model="form">
@@ -82,6 +77,10 @@
                                     <el-option label="主治医师" value="主治医师"></el-option>
                                     <el-option label="副主治医师" value="副主治医师"></el-option>
                                 </el-select>
+                            </el-form-item>
+                            <el-form-item label="医生头像" :label-width="formLabelWidth">
+                                <van-uploader :after-read="afterRead" />
+                                <img :src="form.imgUrl" style="width:80px;height:80px" alt="">
                             </el-form-item>
                         </div>
                     </el-col>
@@ -128,7 +127,7 @@
         data() {
             return {
                 tableData: [],
-                pageData:[],
+                pageData: [],
                 doctor: null,
                 dialogFormVisible: false,
                 scheduleShow: false,
@@ -136,7 +135,9 @@
                     name: '',
                     gender: '',
                     introduction: '',
-                    docTitle: ''
+                    docTitle: '',
+                    fileList:[],
+                    imgUrl:''
                 },
                 value: [],
                 findValue: [],
@@ -151,7 +152,8 @@
                     name: '',
                     docTitle: ''
                 },
-                isdoctor: false
+                isdoctor: false,
+                fileList:[],
             }
         },
         computed: {
@@ -160,9 +162,12 @@
         created() {
             this.get_departments();
             console.log(this.userInfo.type);
-            if (this.userInfo.type === 'doctor') {
+            setTimeout(()=>{
+                if (this.userInfo.type === 'doctor') {
                 this.isdoctor = true
+                console.log(this.isdoctor);
             }
+            },100)
         },
         mounted() {
             this.get_doctors();
@@ -172,7 +177,7 @@
                 let res = await getDoctors();
                 if (res.status === 200) {
                     this.tableData = res.doc;
-                    this.pageData = this.tableData.slice(0,7)
+                    this.pageData = this.tableData.slice(0, 7)
                 }
                 console.log(res.doc);
             },
@@ -208,7 +213,7 @@
                 console.log(222);
                 // dID,dName,dGender,s_id,s_name,introduction,docTitle
                 let res = await changeDoctor(this.doctor.dID, this.form.name, this.form.gender, this.value[1],
-                    s_name, this.form.introduction, this.form.docTitle);
+                    s_name, this.form.introduction, this.form.docTitle,this.form.imgUrl);
                 console.log(res);
                 if (res.status == 200) {
                     this.tableData = [];
@@ -230,7 +235,7 @@
                 }
                 if (res.status === 200) {
                     this.tableData = res.data;
-                    this.pageData = this.tableData.slice(0,7)
+                    this.pageData = this.tableData.slice(0, 7)
                 }
                 console.log(res);
             },
@@ -239,6 +244,15 @@
                 this.form.gender = row.dGender;
                 this.form.introduction = row.dIntroduction;
                 this.form.docTitle = row.docTitle;
+                if (row.dImage) {
+                    this.form.fileList = [
+                        {url:row.dImage,isImage:true}
+                    ];
+                    this.form.imgUrl = row.dImage
+                }else{
+                    this.form.fileList = [];
+                    this.form.imgUrl = '/img/pic1.ed125c38.png'
+                }
                 this.doctor = row;
                 this.dDepartmentList.forEach(item => {
                     item.specialty.forEach(item2 => {
@@ -285,11 +299,20 @@
             handleChange(value) {
                 console.log(value);
             },
-            changePage(page){
-                this.pageData = this.tableData.slice((page-1)*7,page*7);
+            changePage(page) {
+                this.pageData = this.tableData.slice((page - 1) * 7, page * 7);
                 console.log(this.pageData);
                 console.log(page);
-            }
+            },
+            async afterRead(file) {
+                // 此时可以自行将文件上传至服务器
+                console.log(file);
+                this.form.imgUrl = file.content;
+                this.form.fileList = [{
+                    url: file.content,
+                    isImage: true
+                }];
+            },
 
         }
     }
@@ -322,7 +345,11 @@
     .el-form-item__label {
         width: 120px !important;
     }
-    .el-pagination{
+
+    .el-pagination {
         text-align: end;
+    }
+    .van-uploader{
+        float: left;
     }
 </style>

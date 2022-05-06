@@ -8,7 +8,7 @@ const BASE_URL='http://localhost:3000'
 //1.定义基础路线
 export const getHomeData = ()=>ajax(BASE_URL+'/web/api/departmentList');
 //添加医师
-export const addDoctor = (dName,docTitle,dID,dGender,dDepartment,dPmtid,tel,introduction)=>ajax(BASE_URL+'/web/api/addDoc',{dName,docTitle,dID,dGender,dDepartment,dPmtid,tel,introduction},'post');
+export const addDoctor = (dName,docTitle,dID,dGender,dDepartment,dPmtid,tel,introduction,image)=>ajax(BASE_URL+'/web/api/addDoc',{dName,docTitle,dID,dGender,dDepartment,dPmtid,tel,introduction,image},'post');
 //根据科室和时间查询医师
 export const getDocByDay = (s_id,date)=>ajax(BASE_URL+'/web/api/getDocByDay?time='+new Date(),{s_id,date});
 //根据id查询医师
@@ -32,7 +32,7 @@ export const getDepartments = ()=>ajax(BASE_URL+'/web/api/departmentList');
 //修改科室
 export const changeSpecailty = (s_id,oldDepartment,newDepartment,s_name,introduction)=>ajax(BASE_URL+'/web/api/changeSpecailty',{s_id,oldDepartment,newDepartment,s_name,introduction},'post');
 //修改医生信息
-export const changeDoctor = (dID,dName,dGender,s_id,s_name,introduction,docTitle)=>ajax(BASE_URL+'/web/api/changeDoctor',{dID,dName,dGender,s_id,s_name,introduction,docTitle},'post');
+export const changeDoctor = (dID,dName,dGender,s_id,s_name,introduction,docTitle,image)=>ajax(BASE_URL+'/web/api/changeDoctor',{dID,dName,dGender,s_id,s_name,introduction,docTitle,image},'post');
 //添加门诊部门
 export const addDepartment = (departmentName)=>ajax(BASE_URL+'/web/api/addDepartment',{departmentName},'post');
 //添加科室

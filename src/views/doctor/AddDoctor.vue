@@ -10,9 +10,9 @@
       <el-form-item label="性别">
         <el-input v-model="form.dGender"></el-input>
       </el-form-item>
-      <el-form-item label="手机号码">
+      <!-- <el-form-item label="手机号码">
         <el-input v-model="form.dTel"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="所属科室">
         <el-cascader v-model="value" placeholder="请选择科室" :options="options" :props="{ expandTrigger: 'hover' }" @change="handleChange">
         </el-cascader>
@@ -29,11 +29,12 @@
         <el-input type="textarea" :rows="1" placeholder="请输入内容" v-model="form.introduction">
         </el-input>
       </el-form-item>
-
-
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">立即添加</el-button>
+      <el-form-item  label="上传头像">
+        <van-uploader  :after-read="afterRead" />
+        <img :src="imgUrl" style="width:80px;height:80px" alt="">
+        <el-button type="primary" style="position:absolute;top:20px;right:10px" @click="onSubmit">立即添加</el-button>
       </el-form-item>
+
     </el-form>
     <div class="img">
       <img src="@/img/doctor1.png" alt="">
@@ -45,7 +46,7 @@
 import { Message } from "element-ui";
   import {
     getDepartments,
-    addDoctor
+    addDoctor,
   } from '@/service/api/index'
   export default {
     data() {
@@ -57,11 +58,14 @@ import { Message } from "element-ui";
           dGender: '',
           dPmtid: '',
           dTel: '',
-          introduction:''
+          introduction:'',
+
         },
         dDepartmentList: [],
         value: [],
-        options: []
+        options: [],
+        imgUrl:'/img/pic1.ed125c38.png',
+        fileList:[],
       }
     },
     created() {
@@ -69,15 +73,52 @@ import { Message } from "element-ui";
     },
     methods: {
       async onSubmit() {
-        debugger;
+        if (this.form.dName=='') {
+          Message({
+          showClose: true,
+          message: '医生姓名不能为空!',
+          type: 'warning'
+        });
+        return;
+        }
+        if (this.form.docTitle=='') {
+          Message({
+          showClose: true,
+          message: '医生职称不能为空!',
+          type: 'warning'
+        });
+        return;
+        }
+        if (this.form.dID=='') {
+          Message({
+          showClose: true,
+          message: '医生id不能为空!',
+          type: 'warning'
+        });
+        return;
+        }
+        console.log(this.value);
+        if (this.value.length==0) {
+          Message({
+          showClose: true,
+          message: '请选择医生所属科室!',
+          type: 'warning'
+        });
+        return;
+        }
         let res = await addDoctor(this.form.dName, this.form.docTitle, this.form.dID,
-          this.form.dGender, this.value[1].s_name, this.value[1].s_id, this.form.dTel,this.form.introduction);
-          debugger;
+          this.form.dGender, this.value[1].s_name, this.value[1].s_id, this.form.dTel,this.form.introduction,this.imgUrl);
         if (res.status===200) {
           Message({
           showClose: true,
           message: '添加医生成功！',
           type: 'success'
+        });
+        }else if (res.status===400) {
+          Message({
+          showClose: true,
+          message: '添加失败，该医生id已经存在！',
+          type: 'warning'
         });
         }
         console.log(res);
@@ -105,7 +146,16 @@ import { Message } from "element-ui";
       },
       handleChange(value) {
         console.log(value[1]);
-      }
+      },
+      async afterRead(file) {
+      // 此时可以自行将文件上传至服务器
+      console.log(file);
+      this.imgUrl = file.content;
+      this.fileList = [{
+        url:file.content,
+        isImage: true
+      }];
+    },
     }
   }
 </script>
@@ -132,5 +182,8 @@ import { Message } from "element-ui";
   }
   .img img{
     width: 100%;
+  }
+  ::v-deep .el-form-item__content{
+    width: 350px;
   }
 </style>

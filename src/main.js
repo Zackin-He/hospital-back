@@ -3,10 +3,14 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import VCalendar from 'v-calendar'
-import { Button,Container,Header,Main,Aside,Menu,MenuItem,Submenu,MenuItemGroup,Table,TableColumn,
+import { Button,Container,Header,Main,Aside,Menu,MenuItem,Submenu,MenuItemGroup,Upload,Table,TableColumn,InputNumber,
   Dialog,Form,FormItem,Input,Select,Option,Col,Cascader,Avatar,Dropdown,DropdownItem,Pagination,DropdownMenu,Row,Card, Radio
   } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import Uploader from 'vant/lib/uploader';
+import 'vant/lib/uploader/style';
+
+Vue.use(Uploader)
 //全局引入echarts
 import * as echarts from 'echarts';
 //需要挂载到Vue原型上
@@ -44,6 +48,8 @@ Vue.use(Row)
 Vue.use(Card)
 Vue.use(Radio);
 Vue.use(Pagination)
+Vue.use(InputNumber)
+Vue.use(Upload)
 new Vue({
   router,
   store,
